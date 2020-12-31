@@ -25,7 +25,7 @@ CHECK_PATH = ""
 ICON_PATH = ""
 WIN_NAME = ""  # Name of the windows
 
-IMG_SIZE = 150  # Size in pixel for each image
+IMG_SIZE = 256  # Size in pixel for each image
 N_COL = 8  # Number of images column for the layout
 
 
@@ -61,30 +61,36 @@ class QuizNA(QWidget):
         self.gridLayout = QGridLayout()
         self.check_list = [False for img in self.img_list]
 
-        # Add Column Header
-        self.header_col = QHBoxLayout()
-        for ii in range(N_COL):
-            label = QLabel()
-            label.setText(string.ascii_uppercase[ii])
-            label.setAlignment(Qt.AlignCenter)
-            label.setFont(QFont("Arial", 32))
-            label.setMaximumSize(QSize(IMG_SIZE, IMG_SIZE))
-            self.header_col.addWidget(label)
-
         # Create image grid
         for ii, img_name in enumerate(self.img_list):
             # Load and resize all images
             label = self.get_image(join(IMG_PATH, img_name))
             label.index = ii
             # Add to layout
-            self.gridLayout.addWidget(label, ii // N_COL, ii % N_COL)
+            self.gridLayout.addWidget(label, ii // N_COL + 1, ii % N_COL + 1)
             # Add signal
             label.clicked.connect(self.change_check)
 
+        # Add Column header
+        for ii in range(N_COL):
+            label = QLabel()
+            label.setText(string.ascii_uppercase[ii])
+            label.setAlignment(Qt.AlignCenter)
+            label.setFont(QFont("Arial", 32))
+            label.setMaximumSize(QSize(IMG_SIZE, IMG_SIZE))
+            self.gridLayout.addWidget(label, 0, ii + 1)
+
+        # Add line header
+        for ii in range(len(self.img_list) // N_COL):
+            label = QLabel()
+            label.setText(str(ii + 1))
+            label.setAlignment(Qt.AlignCenter)
+            label.setFont(QFont("Arial", 32))
+            label.setMaximumSize(QSize(IMG_SIZE, IMG_SIZE))
+            self.gridLayout.addWidget(label, ii + 1, 0)
+
         # Set main layout
-        main_layout = QVBoxLayout(self)
-        main_layout.addLayout(self.header_col)
-        main_layout.addLayout(self.gridLayout)
+        self.setLayout(self.gridLayout)
 
     def get_image(self, img_path, size=IMG_SIZE):
         """Return a QLabel with the image at the proper size"""
@@ -113,7 +119,7 @@ class QuizNA(QWidget):
         # Update GUI
         self.sender().setParent(None)
         self.check_list[index] = not self.check_list[index]
-        self.gridLayout.addWidget(label, index // N_COL, index % N_COL)
+        self.gridLayout.addWidget(label, index // N_COL + 1, index % N_COL + 1)
 
 
 if __name__ == "__main__":
@@ -121,6 +127,7 @@ if __name__ == "__main__":
     a = QApplication(argv)
 
     w = QuizNA()
+    w.setStyleSheet("* { background-color : white;}")
     w.show()
 
     exit(a.exec_())
