@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys
 from os import listdir
-from os.path import dirname, join, isfile
+from os.path import dirname, join, isfile, basename
 from sys import argv, exit
 from random import shuffle
 import string
@@ -18,12 +18,12 @@ from PySide2.QtCore import Qt, QSize, Signal
 
 
 # Path to folder containing all images
-IMG_PATH = ""
+IMG_PATH = "C:/Users/Pierre/Documents/QuizGrid/images_2021"
 # Path to the check mark image
-CHECK_PATH = ""
+CHECK_PATH = "C:/Users/Pierre/Documents/QuizGrid/check.png"
 # Path to the window icon
-ICON_PATH = ""
-WIN_NAME = ""  # Name of the windows
+ICON_PATH = "C:/Users/Pierre/Documents/QuizGrid/coupe.jpg"
+WIN_NAME = "Quizz 2021"  # Name of the windows
 
 IMG_SIZE = 256  # Size in pixel for each image
 N_COL = 8  # Number of images column for the layout
@@ -101,6 +101,9 @@ class QuizNA(QWidget):
         label.setPixmap(pixmap)
         label.setScaledContents(True)
         label.setMaximumSize(QSize(size, size))
+        if img_path != CHECK_PATH:
+            img_name = basename(img_path)
+            label.setToolTip("Question n°" + img_name.split(".")[0])
         return label
 
     def change_check(self):
@@ -113,6 +116,7 @@ class QuizNA(QWidget):
         else:  # image to check
             label = self.get_image(CHECK_PATH)
             print("Done for " + self.img_list[index].split(".")[0])
+            label.setToolTip("Question n° " + self.img_list[index].split(".")[0])
         label.clicked.connect(self.change_check)
         label.index = index
 
@@ -127,6 +131,7 @@ if __name__ == "__main__":
     a = QApplication(argv)
 
     w = QuizNA()
+    print("Image name are set as tooltips")
     w.setStyleSheet("* { background-color : white;}")
     w.show()
 
